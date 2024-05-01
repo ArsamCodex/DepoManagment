@@ -8,29 +8,67 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="form-floating mb-3">
-        <InputText @bind-Value="receiveBox.BoxBarcode" id="Box Barcode" class="form-control" placeholder="name@example.com" />
+        <InputText @bind-Value="receiveBox.BoxBarcode" id="Box Barcode" class="form-control" placeholder="Box Barcode" />
         <label for="email"> Box Barcode </label>
     </div>
     <div class="form-floating mb-3">
-        <InputDate @bind-Value="receiveBox.IncomeDate" id="email" class="form-control" placeholder="name@example.com" />
+        <InputDate @bind-Value="receiveBox.IncomeDate" id="date" class="form-control" placeholder="Income Date" readonly />
         <label for="email">Income Date </label>
     </div>
     <div class="form-floating mb-3">
-        <InputText @bind-Value="receiveBox.Staff" id="email" class="form-control" placeholder="name@example.com" />
+        <InputText @bind-Value="LogedInUser" id="Staff" class="form-control" placeholder="name@example.com" readonly />
         <label for="email">Staff</label>
     </div>
     <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-danger">Save Data</button>
 </EditForm>
+<hr>
+<hr>
+@if (ReceiveBoxes != null && ReceiveBoxes.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ReceiveBoxID</th>
+                <th>BoxBarcode</th>
+                <th>IncomeDate</th>
+                <th>Staff</th>
+                <th>WhereIsTheBox</th>
+                <th>IsBoxFinishedToGoOut</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var box in ReceiveBoxes)
+            {
+                <tr>
+                    <td>@box.ReceiveBoxID</td>
+                    <td>@box.BoxBarcode</td>
+                    <td>@box.IncomeDate</td>
+                    <td>@box.Staff</td>
+                    <td>@box.WhereIsTheBox</td>
+                    <td>@box.IsBoxFinishedToGoOut</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No receive boxes found.</p>
+}
 
 @code {
     public string LogedInUser { get; set; }
+    public string LoggedInUserStaffName{ get; set; }
     public ReceiveBox receiveBox = new ReceiveBox();
+    public List<ReceiveBox> ReceiveBoxes = new List<ReceiveBox>();
 
     protected override async Task OnInitializedAsync()
     {
         // Check if the user is logged in and fetch their information
         var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
+
+
         if (user.Identity?.IsAuthenticated ?? false)
         {
             // User is authenticated, you can access user ID
@@ -40,8 +78,6 @@
     }
     public async Task HandleValidSubmit1()
     {
-      
-
         ReceiveBox rec = new ReceiveBox
             {
                 BoxBarcode = receiveBox.BoxBarcode,
@@ -50,9 +86,12 @@
                 WhereIsTheBox = Department.Start,
                 IsBoxFinishedToGoOut = false,
             };
-
         await Http.PostAsJsonAsync<ReceiveBox>("api/Receive/ReceiveBoxes", rec);
 
+        ReceiveBoxes = await Http.GetFromJsonAsync<List<ReceiveBox>>("api/Receive/GetAllBoxes");
+        receiveBox = new ReceiveBox();
+        receiveBox.Staff = LogedInUser;
+        receiveBox.IncomeDate = DateTime.Now;
     }
 
 }

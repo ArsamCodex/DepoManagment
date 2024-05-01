@@ -32,5 +32,18 @@ namespace DepoManagment.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("GetAllBoxes")]
+        public async Task<ActionResult<ReceiveBox>> GetBozes()
+        {
+            try
+            {
+                var AllBoxes = await _context.receivBox.OrderByDescending(c => c.IncomeDate).ToListAsync();
+                return Ok(AllBoxes);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
