@@ -14,8 +14,8 @@ namespace DepoManagment.Server.Data
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
         }
-        public DbSet<ExtractBoxDepartment> extractBoxDepartments { get; set; } = default;
-        public DbSet<Parts> parts { get; set; } = default;
-        public DbSet<ReceiveBoxPoint> receiveBoxPoints { get; set; } = default;
+        public DbSet<ReceiveBox> receivBox { get; set; } = default;
+        public DbSet<EnveloopExtract> enveloopExtracts { get; set; } = default;
+
     }
 }

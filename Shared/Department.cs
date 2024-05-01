@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace DepoManagment.Shared
 {
-    public   enum Place
+    public  enum Department
     {
-        A1,
-        A2,
-        A3,
-        A4,
-        A5
+        Start,
+        Extract,
+        Control,
+        Outgoing
     }
 }

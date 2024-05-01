@@ -1,0 +1,58 @@
+﻿@page "/ReceivePoint"
+@inject AuthenticationStateProvider _AuthenticationStateProvider
+@inject HttpClient Http
+@using DepoManagment.Shared
+
+
+<EditForm Model="@receiveBox" OnValidSubmit="@HandleValidSubmit1">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="receiveBox.BoxBarcode" id="Box Barcode" class="form-control" placeholder="name@example.com" />
+        <label for="email"> Box Barcode </label>
+    </div>
+    <div class="form-floating mb-3">
+        <InputDate @bind-Value="receiveBox.IncomeDate" id="email" class="form-control" placeholder="name@example.com" />
+        <label for="email">Income Date </label>
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="receiveBox.Staff" id="email" class="form-control" placeholder="name@example.com" />
+        <label for="email">Staff</label>
+    </div>
+    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-danger">Save Data</button>
+</EditForm>
+
+@code {
+    public string LogedInUser { get; set; }
+    public ReceiveBox receiveBox = new ReceiveBox();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if the user is logged in and fetch their information
+        var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            // User is authenticated, you can access user ID
+            LogedInUser = user.FindFirst(c => c.Type == "sub")?.Value;
+            receiveBox.IncomeDate = DateTime.Now;
+        }
+    }
+    public async Task HandleValidSubmit1()
+    {
+      
+
+        ReceiveBox rec = new ReceiveBox
+            {
+                BoxBarcode = receiveBox.BoxBarcode,
+                IncomeDate = DateTime.Now,
+                Staff = LogedInUser,
+                WhereIsTheBox = Department.Start,
+                IsBoxFinishedToGoOut = false,
+            };
+
+        await Http.PostAsJsonAsync<ReceiveBox>("api/Receive/ReceiveBoxes", rec);
+
+    }
+
+}

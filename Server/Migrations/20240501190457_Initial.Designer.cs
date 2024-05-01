@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DepoManagment.Server.Data.Migrations
+namespace DepoManagment.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240430161103_InitialDepo")]
-    partial class InitialDepo
+    [Migration("20240501190457_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,6 @@ namespace DepoManagment.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("BadgeNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -75,7 +74,6 @@ namespace DepoManagment.Server.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StaffName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -96,6 +94,59 @@ namespace DepoManagment.Server.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("DepoManagment.Shared.EnveloopExtract", b =>
+                {
+                    b.Property<int>("EnveloopExtractID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnveloopExtractID"));
+
+                    b.Property<string>("EnveloopBarcode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAnyProblemWhitEnveloop")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ReceiveBoxID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WhereISEnveloop")
+                        .HasColumnType("int");
+
+                    b.HasKey("EnveloopExtractID");
+
+                    b.ToTable("enveloopExtracts");
+                });
+
+            modelBuilder.Entity("DepoManagment.Shared.ReceiveBox", b =>
+                {
+                    b.Property<int>("ReceiveBoxID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiveBoxID"));
+
+                    b.Property<string>("BoxBarcode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("IncomeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Staff")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WhereIsTheBox")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReceiveBoxID");
+
+                    b.ToTable("receivBox");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.DeviceFlowCodes", b =>

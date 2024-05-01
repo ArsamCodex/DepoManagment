@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace DepoManagment.Shared
 {
-    public class ExtractBoxDepartment
+    public class ReceiveBox
     {
-        public int ExtractBoxDepartmentId { get; set; }
+        public int ReceiveBoxID { get; set; }
         public string BoxBarcode { get; set; }
-        public DateTime ExtractDate { get; set; }
+        public DateTime IncomeDate { get; set; }
         public string Staff { get; set; }
-        public List<Parts> Parts { get; set; }
+        public Department WhereIsTheBox { get; set; }
+        public bool IsBoxFinishedToGoOut { get; set; }
     }
 }
