@@ -9,20 +9,22 @@
     <ValidationSummary />
     <div class="form-floating mb-3">
         <InputText @bind-Value="receiveBox.BoxBarcode" id="Box Barcode" class="form-control" placeholder="Box Barcode" />
-        <label for="email"> Box Barcode </label>
+        <label> Box Barcode </label>
     </div>
     <div class="form-floating mb-3">
-        <InputDate @bind-Value="receiveBox.IncomeDate" id="date" class="form-control" placeholder="Income Date" readonly />
-        <label for="email">Income Date </label>
+        <InputDate @bind-Value="receiveBox.IncomeDate" id="date" class="form-control" style="background-color:#F8F8F2; color:black;" placeholder="Income Date" readonly />
+        <label style="color:red">Date</label>
     </div>
+
     <div class="form-floating mb-3">
-        <InputText @bind-Value="LogedInUser" id="Staff" class="form-control" placeholder="name@example.com" readonly />
-        <label for="email">Staff</label>
+        
+        <InputText @bind-Value="LogedInUser" id="Staff" class="form-control" placeholder="Staff" style="background-color:#F8F8F2; color:black;" readonly />
+        <label style="color:red">Staff</label>
     </div>
-    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-danger">Save Data</button>
+    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-warning">Save Data</button>
 </EditForm>
 <hr>
-<hr>
+
 @if (ReceiveBoxes != null && ReceiveBoxes.Any())
 {
     <table class="table">
@@ -59,6 +61,7 @@ else
 @code {
     public string LogedInUser { get; set; }
     public string LoggedInUserStaffName{ get; set; }
+    public int CurrentBoxCount { get; set; }
     public ReceiveBox receiveBox = new ReceiveBox();
     public List<ReceiveBox> ReceiveBoxes = new List<ReceiveBox>();
 
@@ -74,10 +77,13 @@ else
             // User is authenticated, you can access user ID
             LogedInUser = user.FindFirst(c => c.Type == "sub")?.Value;
             receiveBox.IncomeDate = DateTime.Now;
+
         }
     }
     public async Task HandleValidSubmit1()
     {
+
+
         ReceiveBox rec = new ReceiveBox
             {
                 BoxBarcode = receiveBox.BoxBarcode,
@@ -85,6 +91,7 @@ else
                 Staff = LogedInUser,
                 WhereIsTheBox = Department.Start,
                 IsBoxFinishedToGoOut = false,
+                BoxNumberWhat = CurrentBoxCount++
             };
         await Http.PostAsJsonAsync<ReceiveBox>("api/Receive/ReceiveBoxes", rec);
 

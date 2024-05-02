@@ -1,0 +1,76 @@
+﻿@page "/Extract"
+@using DepoManagment.Shared
+@inject AuthenticationStateProvider _AuthenticationStateProvider
+@inject HttpClient Http
+
+<EditForm Model="@enveloopExtract" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="enveloopBarcode">Box Barcode:</label>
+        <InputText @bind-Value="enveloopExtract.BoxBarcode" id="BoxBarcode" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="enveloopBarcode">Enveloop Barcode:</label>
+        <InputText @bind-Value="enveloopExtract.EnveloopBarcode" id="enveloopBarcode" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="staff">Staff:</label>
+        <InputText @bind-Value="enveloopExtract.Staff" id="staff" class="form-control" readonly />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+@Testbyid
+@code {
+    private EnveloopExtract enveloopExtract = new EnveloopExtract();
+    public string? LogedInUser { get; set; }
+    public int BoxIdNumber { get; set; }
+
+    public string Testbyid { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        var checkBuxExist = await Http.GetFromJsonAsync<bool>($"/api/Receive/CheckOrBoxExist/{enveloopExtract.BoxBarcode}");
+        if (checkBuxExist)
+        {
+
+
+            BoxIdNumber = await Http.GetFromJsonAsync<int>($"api/Receive/GetBoxIdByBarcode/{enveloopExtract.BoxBarcode}");
+            EnveloopExtract x = new EnveloopExtract
+                {
+                    EnveloopBarcode = enveloopExtract.EnveloopBarcode,
+                    BoxBarcode = enveloopExtract.BoxBarcode,
+                    WhereISEnveloop = Department.Extract,
+                    IsAnyProblemWhitEnveloop = false,
+                    ReceiveBoxID = BoxIdNumber,
+                    Staff = LogedInUser,
+                    StartTime = DateTime.Now
+                };
+            await Http.PostAsJsonAsync<EnveloopExtract>($"api/Receive/SaveEnveloopExtract", x);
+
+            var RetriveBoxToEditLocayion=  await Http.GetFromJsonAsync<ReceiveBox>($"/api/Receive/GetBoxById/{BoxIdNumber}");
+            Testbyid = RetriveBoxToEditLocayion.BoxBarcode;
+            
+            RetriveBoxToEditLocayion.WhereIsTheBox = Department.Extract;
+
+            await Http.PutAsJsonAsync<ReceiveBox>($"api/Receive/EditReceiveBoxLocation", RetriveBoxToEditLocayion);
+            
+
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if the user is logged in and fetch their information
+        var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            // User is authenticated, you can access user ID
+            LogedInUser = user.FindFirst(c => c.Type == "sub")?.Value;
+        }
+    }
+}

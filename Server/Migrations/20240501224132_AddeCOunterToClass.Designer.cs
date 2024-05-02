@@ -4,6 +4,7 @@ using DepoManagment.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DepoManagment.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240501224132_AddeCOunterToClass")]
+    partial class AddeCOunterToClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,26 +104,18 @@ namespace DepoManagment.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnveloopExtractID"));
 
-                    b.Property<string>("BoxBarcode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("EnveloopBarcode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EnveloopNumber")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsAnyProblemWhitEnveloop")
                         .HasColumnType("bit");
 
                     b.Property<int>("ReceiveBoxID")
                         .HasColumnType("int");
-
-                    b.Property<string>("Staff")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("WhereISEnveloop")
                         .HasColumnType("int");
@@ -141,9 +136,6 @@ namespace DepoManagment.Server.Migrations
                     b.Property<string>("BoxBarcode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("BoxNumberWhat")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("IncomeDate")
                         .HasColumnType("datetime2");

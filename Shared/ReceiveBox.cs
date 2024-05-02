@@ -9,6 +9,7 @@ namespace DepoManagment.Shared
 {
     public class ReceiveBox
     {
+
         public int ReceiveBoxID { get; set; }
         [Required]
         public string BoxBarcode { get; set; }
@@ -16,5 +17,7 @@ namespace DepoManagment.Shared
         public string Staff { get; set; }
         public Department WhereIsTheBox { get; set; }
         public bool IsBoxFinishedToGoOut { get; set; }
+        public int BoxNumberWhat { get; set; }
+      
     }
 }
