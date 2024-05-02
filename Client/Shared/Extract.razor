@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider _AuthenticationStateProvider
 @inject HttpClient Http
 
+@ErrorMessageU
 <EditForm Model="@enveloopExtract" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -16,25 +17,26 @@
     </div>
     <div class="form-group">
         <label for="staff">Staff:</label>
-        <InputText @bind-Value="enveloopExtract.Staff" id="staff" class="form-control" readonly />
+        <InputText @bind-Value="LogedInUser" id="staff" class="form-control" readonly />
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </EditForm>
-@Testbyid
+
 @code {
     private EnveloopExtract enveloopExtract = new EnveloopExtract();
     public string? LogedInUser { get; set; }
     public int BoxIdNumber { get; set; }
+    public string? ErrorMessageU { get; set; }
 
-    public string Testbyid { get; set; }
 
     private async Task HandleValidSubmit()
     {
+        //Check or this is valid box we check first receive point
         var checkBuxExist = await Http.GetFromJsonAsync<bool>($"/api/Receive/CheckOrBoxExist/{enveloopExtract.BoxBarcode}");
         if (checkBuxExist)
         {
 
-
+            //if its valid box we retrive Box id by Barcode
             BoxIdNumber = await Http.GetFromJsonAsync<int>($"api/Receive/GetBoxIdByBarcode/{enveloopExtract.BoxBarcode}");
             EnveloopExtract x = new EnveloopExtract
                 {
@@ -46,16 +48,20 @@
                     Staff = LogedInUser,
                     StartTime = DateTime.Now
                 };
+                // herewe save Enveloop
             await Http.PostAsJsonAsync<EnveloopExtract>($"api/Receive/SaveEnveloopExtract", x);
 
+            //here we get that valid box by id (whole object ) adn edit it 
             var RetriveBoxToEditLocayion=  await Http.GetFromJsonAsync<ReceiveBox>($"/api/Receive/GetBoxById/{BoxIdNumber}");
-            Testbyid = RetriveBoxToEditLocayion.BoxBarcode;
-            
+
             RetriveBoxToEditLocayion.WhereIsTheBox = Department.Extract;
 
+            //here we edit object 
             await Http.PutAsJsonAsync<ReceiveBox>($"api/Receive/EditReceiveBoxLocation", RetriveBoxToEditLocayion);
-            
-
+        }
+        else
+        {
+            ErrorMessageU = "Invalid Box";
         }
 
     }
@@ -65,8 +71,6 @@
         // Check if the user is logged in and fetch their information
         var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
-
         if (user.Identity?.IsAuthenticated ?? false)
         {
             // User is authenticated, you can access user ID
